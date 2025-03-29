@@ -10,13 +10,17 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI(title="CreditSage: Mortgage Credit Rating API for RBMS")
 
 
+
 origins = [
-    "http://localhost:3000", 
+    "http://localhost:3000",  
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=origins,  
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],  
 )
 
 @app.post("/mortgages/", response_model=dict)
@@ -83,5 +87,5 @@ def fetch_credit_rating(db: Session = Depends(get_db)):
                 "Updated Credit Rating": result
                 }
     except Exception as e:
-        logger.error(f"Error fetching credit-rating: {str(e)}")
+        logger.error(f"Error fetching mortgages: {str(e)}")
         raise HTTPException(status_code=500, detail="Could not fetch data")
