@@ -2,12 +2,22 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from schemas import MortgageCreate, MortgageResponse
-from db_utils import insert_mortgage, delete_mortgage, get_all_mortgages, update_mortgage
+from db_utils import insert_mortgage, delete_mortgage, get_all_mortgages, update_credit_rating, update_mortgage
 from logger import logger
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI(title="CreditSage: Mortgage Credit Rating API for RBMS")
 
+
+origins = [
+    "http://localhost:3000", 
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+)
 
 @app.post("/mortgages/", response_model=dict)
 def add_mortgage(mortgage: MortgageCreate, db: Session = Depends(get_db)):
@@ -63,3 +73,15 @@ def remove_mortgage(mortgage_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"Error deleting mortgage {mortgage_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Could not delete mortgage")
+    
+@app.get("/credit-rating/", response_model=dict)
+def fetch_credit_rating(db: Session = Depends(get_db)):
+    try:
+        result = update_credit_rating(db)
+        logger.info("Fetched all mortgages")
+        return {"message": "Credit Rating fetched successfully",
+                "Updated Credit Rating": result
+                }
+    except Exception as e:
+        logger.error(f"Error fetching credit-rating: {str(e)}")
+        raise HTTPException(status_code=500, detail="Could not fetch data")

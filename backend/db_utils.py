@@ -9,9 +9,6 @@ def update_credit_rating(db:Session):
     final_rating = CreditRatingCalculator.get_final_credit_rating(all_mortgages)
     return final_rating
 
-def get_all_mortgages(db: Session):
-    return db.query(Mortgage).all()
-
 def insert_mortgage(db: Session, mortgage_data: MortgageCreate):
     db_mortgage = Mortgage(**mortgage_data.dict())
     db.add(db_mortgage)
@@ -21,6 +18,9 @@ def insert_mortgage(db: Session, mortgage_data: MortgageCreate):
     final_rating = update_credit_rating(db)
 
     return final_rating
+
+def get_all_mortgages(db: Session):
+    return db.query(Mortgage).all()
 
 def update_mortgage(db: Session, mortgage_id: int, mortgage_data: MortgageCreate):
     """
