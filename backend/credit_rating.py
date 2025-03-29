@@ -1,5 +1,4 @@
 import logging
-from sqlalchemy.orm import Session
 from models import Mortgage
 from typing import List
 from logger import logger
@@ -77,13 +76,13 @@ class CreditRatingCalculator:
     @staticmethod
     def get_final_credit_rating(mortgages: List['CreditRatingCalculator']) -> str:
         """
-        Calculates the final credit rating for multiple mortgages based on the average credit score.
+        Calculates the final credit rating for multiple mortgages based on the average credit score and indivdaul mortgage risk score.
         """
         if not mortgages:
             logger.warning("No mortgages found in the database.")
             return "No mortgages available"
 
-        total_risk_score = sum(m.get_risk_score() for m in mortgages)
+        total_risk_score = sum(m.get_risk_score() for m in mortgages)// len(mortgages) #fix: to ensure adding more mortgages doesn't downgrade the credit rating unfairly.
         avg_credit_score = sum(m.credit_score for m in mortgages) // len(mortgages)
 
         logger.info(f"Total Risk Score: {total_risk_score}, Average Credit Score: {avg_credit_score}")
