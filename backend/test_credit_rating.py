@@ -18,7 +18,12 @@ def mortgages():
     "moderate_risk": Mortgage(id=3, credit_score=680, loan_amount=90000,
                               property_value=100000, annual_income=50000,
                               debt_amount=20000, loan_type="adjustable", property_type="single_family"),
-
+    "high_credit_score": Mortgage(id=4, credit_score=849, loan_amount=90000,
+                              property_value=100000, annual_income=50000,
+                              debt_amount=20000, loan_type="fixed", property_type="single_family"),
+    "low_credit_score": Mortgage(id=5, credit_score=301, loan_amount=90000,
+                              property_value=100000, annual_income=50000,
+                              debt_amount=20000, loan_type="fixed", property_type="single_family"),
 }
     
 def test_ltv_calculation(mortgages):
@@ -42,7 +47,16 @@ def test_credit_rating_calculation(mortgages):
     rating = CreditRatingCalculator.get_final_credit_rating(mortgage_calculators)
     assert rating == "BBB"  # Based on the average risk score
 
+def test_credit_score_risk_comparison_for_credit_score(mortgages):
+    """Test that a lower credit score results in a higher risk score."""
+    
+    high_risk_calculator = CreditRatingCalculator(mortgages["high_credit_score"])
+    low_risk_calculator = CreditRatingCalculator(mortgages["low_credit_score"])
 
+    high_risk_score = high_risk_calculator.get_risk_score()
+    low_risk_score = low_risk_calculator.get_risk_score()
+
+    assert low_risk_score > high_risk_score
 
 def test_different_loan_types(mortgages):
     """Test risk score impact of fixed vs. adjustable loans."""
