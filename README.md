@@ -43,8 +43,10 @@ Ensure you have the following installed:
    ```
 5. **Set environment variables (or use a `.env` file):**
    ```sh
-   export DATABASE_URL="mysql+pymysql://admin:pass1234@localhost/mortgages"
+   export DATABASE_URL=mysql+pymysql://admin:pass1234@localhost/mortgages
    export LOG_LEVEL=INFO
+   export LOG_FORMAT=%(asctime)s - %(levelname)s - %(name)s - %(message)s
+   export REACT_APP_API_BASE_URL=http://127.0.0.1:8000
    ```
 6. **Run the FastAPI server:**
    ```sh
@@ -60,23 +62,19 @@ Ensure you have the following installed:
    ```sh
    npm install
    ```
-3. **Set environment variables (or use a `.env` file):**
-   ```sh
-   export REACT_APP_API_BASE_URL=http://127.0.0.1:8000
-   ```
-4. **Run the React app:**
+3. **Run the React app:**
    ```sh
    npm start
    ```
 
 ### **MySQL Setup (Local Installation)**
-1. Start MySQL service.
-2. Create a database:
+1. **Start MySQL service.**
+2. **Create a database:**
    ```sql
    CREATE DATABASE mortgages;
    ```
-3. Ensure the database credentials match the `.env` configuration.
-4. Create the `mortgages` table:
+3. **Ensure the database credentials match the `.env` configuration.**
+4. **Create the `mortgages` table:**
    ```sql
    CREATE TABLE mortgages (
        id INT AUTO_INCREMENT PRIMARY KEY,
@@ -101,7 +99,7 @@ Before running Docker Compose, ensure your `.env` file has the following values:
 DATABASE_URL=mysql+pymysql://admin:pass1234@mysql-container/mortgages
 LOG_LEVEL=INFO
 LOG_FORMAT=%(asctime)s - %(levelname)s - %(name)s - %(message)s
-REACT_APP_API_BASE_URL=http://backend:8000
+REACT_APP_API_BASE_URL=http://127.0.0.1:8000
 ```
 
 ### **Steps:**
@@ -127,6 +125,8 @@ REACT_APP_API_BASE_URL=http://backend:8000
    docker exec -it mysql-container mysql -uadmin -ppass1234
    ```
    ```sql
+   CREATE DATABASE mortgages;
+   USE mortgages;
    CREATE TABLE mortgages (
        id INT AUTO_INCREMENT PRIMARY KEY,
        credit_score INT NOT NULL,
@@ -177,4 +177,3 @@ docker-compose down
 ---
 
 Now, you can successfully run the project with and without Docker! 🚀
-
