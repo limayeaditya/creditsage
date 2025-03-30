@@ -3,6 +3,6 @@ body {
   margin: 0;
   padding: 0;
   height: 100vh;
-  background: linear-gradient(to right, #FBF5E5, #C890A7, #E0C2FF);
-  font-family: 'Arial', sans-serif;
+  background: linear-gradient(to right, #fbf5e5, #c890a7, #e0c2ff);
+  font-family: "Arial", sans-serif;
 }

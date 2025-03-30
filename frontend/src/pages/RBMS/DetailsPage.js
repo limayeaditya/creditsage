@@ -1,14 +1,14 @@
+import { Alert, Box, Button, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import LineGraph from "../../components/LineGraph";
-import { apiCall } from "../../service/apiContext";
-import { Box, Typography, CircularProgress, Button, Alert } from "@mui/material";
 import MortgageDataTable from "../../components/MortgageDataTable";
 import MortgageFormModal from "../../components/MortgageModal";
+import PieChartWithNeedle from "../../components/PieChartWithNeedle";
+import { apiCall } from "../../service/apiContext";
 
 const DetailsPage = () => {
   const [mortgageData, setMortgageData] = useState([]);
-  const [creditRating, setCreditRating] = useState("---");
-
+  const [creditRating, setCreditRating] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openModal, setOpenModal] = useState(false);
@@ -23,38 +23,30 @@ const DetailsPage = () => {
 
   const handleDelete = async (rowId) => {
     try {
-    const mortgageResponse = await apiCall(`mortgages/${rowId}`, "DELETE");
-    setAlertMessage("Data deleted successfully!");
-    setAlertType("success");
-    fetchRMBSData()
-    setCreditRating(mortgageResponse["Updated Credit Rating"])
+      await apiCall(`mortgages/${rowId}`, "DELETE");
+      setAlertMessage("Data deleted successfully!");
+      setAlertType("success");
+      fetchRMBSData();
     } catch (error) {
       console.error("Error:", error);
-      setAlertMessage("Failed to save data.");
+      setAlertMessage("Failed to delete data.");
       setAlertType("error");
     }
-
   };
 
   const handleSave = async (formData) => {
     try {
-      if (editingData) {
-        console.log("Updated Data:", formData);
-        // API call to update existing entry
+      if (formData.id) {
+        await apiCall(`mortgages/${formData.id}`, "PUT", formData);
         setAlertMessage("Data updated successfully!");
-        setCreditRating(creditRating["Updated Credit Rating"])
-
       } else {
-        console.log("New Data:", formData);
-        const mortgageResponse = await apiCall("mortgages/", "POST", formData);
-        console.log(mortgageResponse, "CREDIT RATING");
+        await apiCall("mortgages/", "POST", formData);
         setAlertMessage("Data added successfully!");
-        setCreditRating(creditRating["Updated Credit Rating"])
-
       }
       setAlertType("success");
       setOpenModal(false);
-      fetchRMBSData(); // Refresh data after adding/editing
+      setEditingData(null);
+      fetchRMBSData();
     } catch (err) {
       console.error("Error:", err);
       setAlertMessage("Failed to save data.");
@@ -65,13 +57,20 @@ const DetailsPage = () => {
   const fetchRMBSData = async () => {
     try {
       const mortgageResponse = await apiCall("mortgages/");
-      const creditRating = await apiCall("credit-rating/");
+      const creditRatingResponse = await apiCall("credit-rating/");
       setMortgageData(mortgageResponse);
-      setCreditRating(creditRating["Updated Credit Rating"])
-      setLoading(false);
+      setCreditRating(
+        creditRatingResponse?.["Updated Credit Rating"] > 0
+          ? creditRatingResponse?.["Updated Credit Rating"]
+          : null
+      );
+      setError(null);
     } catch (error) {
       console.error("Error fetching RMBS data:", error);
       setError("Failed to fetch data");
+      setMortgageData([]);
+      setCreditRating(null);
+    } finally {
       setLoading(false);
     }
   };
@@ -80,7 +79,6 @@ const DetailsPage = () => {
     fetchRMBSData();
   }, []);
 
-  // Auto-close alert after 3 seconds
   useEffect(() => {
     if (alertMessage) {
       const timer = setTimeout(() => setAlertMessage(""), 3000);
@@ -88,42 +86,89 @@ const DetailsPage = () => {
     }
   }, [alertMessage]);
 
-  if (loading) return <CircularProgress />;
-  if (error) return <Typography color="error">{error}</Typography>;
+  const getCreditRating = () => {
+    if (creditRating === null) return "---";
+    if (creditRating <= 2) return "AAA";
+    if (creditRating >= 3 && creditRating <= 5) return "BBB";
+    return "C";
+  };
 
   return (
     <Box sx={{ padding: "2rem" }}>
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Typography variant="h4" fontWeight="bold" color="primary">
-          RMBS Alpha
-        </Typography>
-        <Box sx={{ position: "fixed", top: 10, right: 20, zIndex: 1000, minWidth: "250px" }}>
-  {alertMessage && <Alert severity={alertType} onClose={() => setAlertMessage("")}>{alertMessage}</Alert>}
-</Box>
-      </Box>
-
-      <Typography variant="body1" sx={{ mt: 2 }}>
-      A high-quality mortgage-backed security with low-risk loans and stable returns.
+      <Typography variant="h4" fontWeight="bold" color="primary">
+        RMBS Alpha
       </Typography>
-      <Typography variant="body2" sx={{ mt: 2 }}>
-        Credit Rating: {creditRating}
+      <Typography color="secondary" variant="body1" sx={{ mt: 2 }}>
+        A high-quality mortgage-backed security with low-risk loans and stable
+        returns.
       </Typography>
 
-      <Button onClick={() => setOpenModal(true)} variant="outlined" color="primary" sx={{ mt: 2, fontSize: 12, fontWeight: 700 }}>
-        Insert Mortgage Data
-      </Button>
-
-      {/* Show Mortgage Data Table */}
-      {mortgageData.length > 0 ? (
+      {!error && creditRating !== null && (
         <>
-          <LineGraph data={mortgageData} />
-          <MortgageDataTable mortgageData={mortgageData} onDelete={handleDelete} onEdit={handleEdit} />
+          <PieChartWithNeedle credit_score={creditRating} />
+          <Typography color="secondary" variant="body1" sx={{ ml: 2, mt: 1 }}>
+            Credit Rating: {getCreditRating()}
+          </Typography>
         </>
-      ) : (
-        <Typography sx={{ mt: 2 }}>No mortgage data available.</Typography>
       )}
 
-      <MortgageFormModal open={openModal} handleClose={() => setOpenModal(false)} onSave={handleSave} existingData={editingData} />
+      <Box
+        sx={{
+          position: "fixed",
+          top: 10,
+          right: 20,
+          zIndex: 1000,
+          minWidth: "250px",
+        }}
+      >
+        {alertMessage && (
+          <Alert severity={alertType} onClose={() => setAlertMessage("")}>
+            {alertMessage}
+          </Alert>
+        )}
+      </Box>
+
+      {error ? (
+        <Typography color="error" sx={{ mt: 2 }}>
+          {error}
+        </Typography>
+      ) : (
+        <>
+          <Button
+            onClick={() => setOpenModal(true)}
+            variant="outlined"
+            color="primary"
+            sx={{ mt: 2, fontSize: 12, fontWeight: 700 }}
+          >
+            Insert Mortgage Data
+          </Button>
+
+          {mortgageData.length > 0 ? (
+            <>
+              <LineGraph data={mortgageData} />
+              <MortgageDataTable
+                mortgageData={mortgageData}
+                onDelete={handleDelete}
+                onEdit={handleEdit}
+              />
+            </>
+          ) : (
+            <Typography sx={{ mt: 2 }} color="error">
+              No mortgage data available.
+            </Typography>
+          )}
+
+          <MortgageFormModal
+            open={openModal}
+            handleClose={() => {
+              setEditingData(null);
+              setOpenModal(false);
+            }}
+            onSave={handleSave}
+            existingData={editingData}
+          />
+        </>
+      )}
     </Box>
   );
 };

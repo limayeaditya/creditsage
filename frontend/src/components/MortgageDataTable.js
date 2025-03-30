@@ -1,22 +1,19 @@
-import React from "react";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import {
+  IconButton,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  IconButton,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import React from "react";
 
-/**
- * Capitalize first letter of each word
- */
 const toTitleCase = (str) => {
-  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+  return str.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
 const MortgageDataTable = ({ mortgageData, onEdit, onDelete }) => {
@@ -67,8 +64,12 @@ const MortgageDataTable = ({ mortgageData, onEdit, onDelete }) => {
               <TableCell align="center">{item.property_value}</TableCell>
               <TableCell align="center">{item.annual_income}</TableCell>
               <TableCell align="center">{item.debt_amount}</TableCell>
-              <TableCell align="center">{toTitleCase(item.loan_type)}</TableCell>
-              <TableCell align="center">{toTitleCase(item.property_type)}</TableCell>
+              <TableCell align="center">
+                {toTitleCase(item.loan_type)}
+              </TableCell>
+              <TableCell align="center">
+                {toTitleCase(item.property_type)}
+              </TableCell>
               <TableCell align="center">
                 {new Date(item.created_at).toLocaleDateString("en-GB", {
                   day: "2-digit",
