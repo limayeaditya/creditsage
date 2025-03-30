@@ -35,7 +35,7 @@ const MortgageFormModal = ({ open, handleClose, onSave, existingData }) => {
 
   useEffect(() => {
     if (error) {
-      const timer = setTimeout(() => setError(""), 3000);
+      const timer = setTimeout(() => setError(""), 2000);
       return () => clearTimeout(timer);
     }
   }, [error]);
@@ -50,27 +50,41 @@ const MortgageFormModal = ({ open, handleClose, onSave, existingData }) => {
     const property_value = Number(formData.property_value);
     const annual_income = Number(formData.annual_income);
     const debt_amount = Number(formData.debt_amount);
-
-    if (credit_score < 300 || credit_score > 850) {
-      setError("Credit score must be between 300 and 850.");
+  
+    if (!credit_score || credit_score < 300 || credit_score > 850) {
+      setError("Credit score must be a number between 300 and 850.");
       return;
     }
-    if (
-      loan_amount <= 0 ||
-      property_value <= 0 ||
-      annual_income <= 0 ||
-      debt_amount < 0
-    ) {
-      setError(
-        "Loan Amount, Property Value, and Annual Income must be positive numbers."
-      );
+    if (!loan_amount || loan_amount <= 0) {
+      setError("Loan Amount must be a positive number.");
       return;
     }
-
+    if (!property_value || property_value <= 0) {
+      setError("Property Value must be a positive number.");
+      return;
+    }
+    if (loan_amount > property_value) {
+      setError("Loan Amount cannot be greater than Property Value.");
+      return;
+    }
+    if (!annual_income || annual_income <= 0) {
+      setError("Annual Income must be a positive number.");
+      return;
+    }
+    if (!debt_amount || debt_amount < 0) {
+      setError("Debt Amount must be a non-negative number.");
+      return;
+    }
+    if (debt_amount > annual_income) {
+      setError("Debt Amount cannot exceed Annual Income.");
+      return;
+    }
+  
     setError("");
     onSave(formData);
     handleClose();
   };
+  
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
