@@ -1,5 +1,6 @@
 # CreditSage
 We are a credit rating agency that assesses the creditworthiness of financial products, specifically residential mortgage-backed securities (RMBS). Our ratings are critical for investors and institutions in determining the quality and risk associated with mortgage-backed securities.
+
 # Project Setup Guide
 
 This document provides step-by-step instructions to run the project, both with and without Docker.
@@ -77,7 +78,6 @@ Ensure you have the following installed:
 3. Ensure the database credentials match the `.env` configuration.
 4. Create the `mortgages` table:
    ```sql
-   USE mortgages;
    CREATE TABLE mortgages (
        id INT AUTO_INCREMENT PRIMARY KEY,
        credit_score INT NOT NULL,
@@ -127,7 +127,6 @@ REACT_APP_API_BASE_URL=http://backend:8000
    docker exec -it mysql-container mysql -uadmin -ppass1234
    ```
    ```sql
-   USE mortgages;
    CREATE TABLE mortgages (
        id INT AUTO_INCREMENT PRIMARY KEY,
        credit_score INT NOT NULL,
@@ -149,7 +148,19 @@ docker-compose down
 
 ---
 
-## **4. Debugging Issues**
+## **4. API Endpoints**
+### **Mortgage APIs**
+- **GET** `/mortgages/` → Fetch Mortgages
+- **POST** `/mortgages/` → Add Mortgage
+- **PUT** `/mortgages/{mortgage_id}/` → Edit Mortgage
+- **DELETE** `/mortgages/{mortgage_id}/` → Remove Mortgage
+
+### **Credit Rating API**
+- **GET** `/credit-rating/` → Fetch Credit Rating
+
+---
+
+## **5. Debugging Issues**
 - **Check running containers:**
   ```sh
   docker ps
