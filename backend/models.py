@@ -19,7 +19,7 @@ class Mortgage(Base):
 
     @validates("credit_score")
     def validate_credit_score(self, key, value):
-        if not (300 < value < 850):
+        if not (300 <= value <= 850):
             raise ValueError(f"Invalid credit score: {value}. Must be between 300 and 850.")
         return value
 
