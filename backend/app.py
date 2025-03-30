@@ -6,10 +6,7 @@ from db_utils import insert_mortgage, delete_mortgage, get_all_mortgages, update
 from logger import logger
 from fastapi.middleware.cors import CORSMiddleware
 
-
 app = FastAPI(title="CreditSage: Mortgage Credit Rating API for RBMS")
-
-
 
 origins = [
     "http://localhost:3000",  
@@ -60,7 +57,6 @@ def edit_mortgage(mortgage_id: int, updated_mortgage: MortgageCreate, db: Sessio
     except Exception as e:
         logger.error(f"Error updating mortgage {mortgage_id}: {str(e)}")
         raise HTTPException(status_code=400, detail="Error updating mortgage")
-
 
 @app.delete("/mortgages/{mortgage_id}/", response_model=dict)
 def remove_mortgage(mortgage_id: int, db: Session = Depends(get_db)):

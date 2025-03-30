@@ -80,7 +80,7 @@ class CreditRatingCalculator:
         """
         if not mortgages:
             logger.warning("No mortgages found in the database.")
-            return "No mortgages available"
+            return -1
 
         total_risk_score = sum(m.get_risk_score() for m in mortgages)// len(mortgages) #fix: to ensure adding more mortgages doesn't downgrade the credit rating unfairly.
         avg_credit_score = sum(m.credit_score for m in mortgages) // len(mortgages)
@@ -95,13 +95,5 @@ class CreditRatingCalculator:
             total_risk_score += 1
             logger.debug("Average Credit Score < 650: Added 1 to total risk score")
 
-        # Assign Credit Rating based on total risk score
-        if total_risk_score <= 2:
-            rating = "AAA"
-        elif 3 <= total_risk_score <= 5:
-            rating = "BBB"
-        else:
-            rating = "C"
-
-        logger.info(f"Final Credit Rating: {rating}")
-        return rating
+        logger.info(f"Final Credit Rating: {total_risk_score}")
+        return total_risk_score
