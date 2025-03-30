@@ -20,8 +20,8 @@ class MortgageCreate(BaseModel):
     property_value: float
     annual_income: float
     debt_amount: float
-    loan_type: LoanTypeEnum  # Uses Enum
-    property_type: PropertyTypeEnum  # Uses Enum
+    loan_type: LoanTypeEnum 
+    property_type: PropertyTypeEnum  
 
 # Response Model with ID & Timestamp
 class MortgageResponse(MortgageCreate):
