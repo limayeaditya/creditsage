@@ -23,9 +23,6 @@ def get_all_mortgages(db: Session):
     return db.query(Mortgage).all()
 
 def update_mortgage(db: Session, mortgage_id: int, mortgage_data: MortgageCreate):
-    """
-    Updates an existing mortgage in the database.
-    """
     mortgage = db.query(Mortgage).filter(Mortgage.id == mortgage_id).first()
     if not mortgage:
         return None
@@ -41,9 +38,6 @@ def update_mortgage(db: Session, mortgage_id: int, mortgage_data: MortgageCreate
     return final_rating
 
 def delete_mortgage(db: Session, mortgage_id: int) -> bool:
-    """
-    Deletes a mortgage from the database.
-    """
     mortgage = db.query(Mortgage).filter(Mortgage.id == mortgage_id).first()
     if not mortgage:
         return False
