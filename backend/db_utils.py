@@ -23,18 +23,13 @@ def get_all_mortgages(db: Session):
     return db.query(Mortgage).all()
 
 def update_mortgage(db: Session, mortgage_id: int, mortgage_data: MortgageCreate):
-    mortgage = db.query(Mortgage).filter(Mortgage.id == mortgage_id).first()
+    mortgage = db.query(Mortgage).filter(Mortgage.id == mortgage_id)
     if not mortgage:
         return None
 
-    for key, value in mortgage_data.dict().items():
-        setattr(mortgage, key, value)
-
+    mortgage.update(mortgage_data.dict())
     db.commit()
-    db.refresh(mortgage)
-    
     final_rating = update_credit_rating(db)
-
     return final_rating
 
 def delete_mortgage(db: Session, mortgage_id: int) -> bool:
